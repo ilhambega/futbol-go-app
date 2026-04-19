@@ -5,14 +5,14 @@ import { supabase } from '../lib/supabase'
 const NOTIFY_URL = 'https://yajerdfaccnnxhvhqhes.supabase.co/functions/v1/notify'
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhamVyZGZhY2NubnhodmhxaGVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NzU4MTUsImV4cCI6MjA5MjE1MTgxNX0.bi9biNsmVrX3vjizzmt2wzWu8xDN0JaBXganEPdf4dQ'
 
-async function notify(type, game) {
+async function notify(type, game, extra = {}) {
   await fetch(NOTIFY_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${ANON_KEY}`,
     },
-    body: JSON.stringify({ type, game }),
+    body: JSON.stringify({ type, game, ...extra }),
   })
 }
 
@@ -45,7 +45,6 @@ export default function GameDetail() {
       .from('registrations')
       .select('*')
       .eq('game_id', id)
-
     setRegistrations(data || [])
     if (userId) {
       setRegistered(data?.some(r => r.user_id === userId))
@@ -73,6 +72,10 @@ export default function GameDetail() {
     if (!error) {
       setRegistered(true)
 
+      // Уведомление игроку в личку
+      await notify('player_registered', game, { userId })
+
+      // Проверяем количество записавшихся
       const { data: regs } = await supabase
         .from('registrations')
         .select('*')
@@ -96,7 +99,6 @@ export default function GameDetail() {
       .delete()
       .eq('game_id', id)
       .eq('user_id', userId)
-
     setRegistered(false)
     fetchRegistrations()
   }
