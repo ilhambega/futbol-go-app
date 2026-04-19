@@ -35,11 +35,12 @@ export default function Admin() {
     }
     setLoading(true)
     const { error } = await supabase.from('games').insert({
-      ...form,
-      max_players: parseInt(form.max_players),
-      min_players: parseInt(form.min_players),
-      price: parseInt(form.price),
-    })
+  ...form,
+  scheduled_at: new Date(form.scheduled_at).toISOString(),
+  max_players: parseInt(form.max_players),
+  min_players: parseInt(form.min_players),
+  price: parseInt(form.price),
+})
     setLoading(false)
     if (!error) {
       setSuccess(true)
@@ -52,7 +53,7 @@ export default function Admin() {
         min_players: 6,
         price: 0,
       })
-      setTimeout(() => setSuccess(false), 3000)
+      setTimeout(() => navigate('/'), 1500)
     }
   }
 
