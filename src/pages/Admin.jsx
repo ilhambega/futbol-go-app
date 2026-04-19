@@ -34,27 +34,39 @@ export default function Admin() {
       return
     }
     setLoading(true)
-    const { error } = await supabase.from('games').insert({
+    const gameData = {
   ...form,
   scheduled_at: new Date(form.scheduled_at).toISOString(),
   max_players: parseInt(form.max_players),
   min_players: parseInt(form.min_players),
   price: parseInt(form.price),
-})
-    setLoading(false)
-    if (!error) {
-      setSuccess(true)
-      setForm({
-        title: '',
-        field_name: '',
-        address: '',
-        scheduled_at: '',
-        max_players: 10,
-        min_players: 6,
-        price: 0,
-      })
-      setTimeout(() => navigate('/'), 1500)
-    }
+}
+
+const { data, error } = await supabase
+  .from('games')
+  .insert(gameData)
+  .select()
+  .single()
+
+setLoading(false)
+if (!error) {
+  await fetch('https://yajerdfaccnnxhvhqhes.supabase.co/functions/v1/notify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'game_created', game: data }),
+  })
+  setSuccess(true)
+  setForm({
+    title: '',
+    field_name: '',
+    address: '',
+    scheduled_at: '',
+    max_players: 10,
+    min_players: 6,
+    price: 0,
+  })
+  setTimeout(() => navigate('/'), 1500)
+}
   }
 
   const inputStyle = {
