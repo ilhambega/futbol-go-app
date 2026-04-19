@@ -87,7 +87,17 @@ export default function Admin() {
   }
 
   async function handleCancel(game) {
-    if (!confirm(`Отменить игру "${game.title}"?`)) return
+  if (!window.Telegram?.WebApp?.showConfirm) {
+    // fallback
+  } else {
+    const confirmed = await new Promise(resolve =>
+      window.Telegram.WebApp.showConfirm(
+        `Отменить игру "${game.title}"?`,
+        resolve
+      )
+    )
+    if (!confirmed) return
+  }
 
     const { data: regs } = await supabase
       .from('registrations')
