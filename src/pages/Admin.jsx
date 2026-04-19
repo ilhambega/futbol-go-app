@@ -51,10 +51,13 @@ const { data, error } = await supabase
 setLoading(false)
 if (!error) {
   await fetch('https://yajerdfaccnnxhvhqhes.supabase.co/functions/v1/notify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'game_created', game: data }),
-  })
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhamVyZGZhY2NubnhodmhxaGVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NzU4MTUsImV4cCI6MjA5MjE1MTgxNX0.bi9biNsmVrX3vjizzmt2wzWu8xDN0JaBXganEPdf4dQ',
+  },
+  body: JSON.stringify({ type: 'game_created', game: data }),
+})
   setSuccess(true)
   setForm({
     title: '',
