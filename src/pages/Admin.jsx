@@ -87,32 +87,39 @@ export default function Admin() {
   }
 
   async function handleCancel(game) {
-  if (!window.Telegram?.WebApp?.showConfirm) {
-    // fallback
-  } else {
-    const confirmed = await new Promise(resolve =>
+  const confirmed = await new Promise(resolve => {
+    if (window.Telegram?.WebApp?.showConfirm) {
       window.Telegram.WebApp.showConfirm(
         `Отменить игру "${game.title}"?`,
         resolve
       )
-    )
-    if (!confirmed) return
-  }
+    } else {
+      resolve(true)
+    }
+  })
 
-    const { data: regs } = await supabase
-      .from('registrations')
-      .select('user_id')
-      .eq('game_id', game.id)
+  if (!confirmed) return
 
-    const players = regs?.map(r => r.user_id) || []
+  const { data: regs } = await supabase
+    .from('registrations')
+    .select('user_id')
+    .eq('game_id', game.id)
 
-    await supabase
-      .from('games')
-      .update({ status: 'cancelled' })
-      .eq('id', game.id)
+  const players = regs?.map(r => r.user_id) || []
 
+  const { error } = await supabase
+    .from('games')
+    .update({ status: 'cancelled' })
+    .eq('id', game.id)
+
+  if (!error) {
     await notify('game_cancelled', game, { players })
+    alert(players.length > 0
+      ? `Игра отменена. Уведомлено ${players.length} игроков.`
+      : 'Игра отменена. Записавшихся не было.'
+    )
     fetchGames()
+  }
   }
 
   async function handleReminder(game) {
