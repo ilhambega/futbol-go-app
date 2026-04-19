@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
-const ADMIN_ID = null // сюда вставим твой Telegram ID
+const ADMIN_ID = 938184349
 
 export default function Admin() {
   const navigate = useNavigate()
