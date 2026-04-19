@@ -2,6 +2,20 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
+const NOTIFY_URL = 'https://yajerdfaccnnxhvhqhes.supabase.co/functions/v1/notify'
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhamVyZGZhY2NubnhodmhxaGVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NzU4MTUsImV4cCI6MjA5MjE1MTgxNX0.bi9biNsmVrX3vjizzmt2wzWu8xDN0JaBXganEPdf4dQ'
+
+async function notify(type, game) {
+  await fetch(NOTIFY_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${ANON_KEY}`,
+    },
+    body: JSON.stringify({ type, game }),
+  })
+}
+
 export default function GameDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -44,7 +58,6 @@ export default function GameDetail() {
       return
     }
 
-    // Сначала убедимся что пользователь есть в таблице users
     const tgUser = window.Telegram.WebApp.initDataUnsafe.user
     await supabase.from('users').upsert({
       id: userId,
@@ -59,6 +72,20 @@ export default function GameDetail() {
 
     if (!error) {
       setRegistered(true)
+
+      const { data: regs } = await supabase
+        .from('registrations')
+        .select('*')
+        .eq('game_id', id)
+
+      const count = regs?.length || 0
+
+      if (count === game.max_players) {
+        await notify('game_full', game)
+      } else if (count === game.min_players) {
+        await notify('min_reached', game)
+      }
+
       fetchRegistrations()
     }
   }
