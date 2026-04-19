@@ -5,6 +5,7 @@ import GameDetail from './pages/GameDetail'
 import Ads from './pages/Ads'
 import Profile from './pages/Profile'
 import BottomNav from './components/BottomNav'
+import Admin from './pages/Admin'
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/game/:id" element={<GameDetail />} />
         <Route path="/ads" element={<Ads />} />
         <Route path="/profile" element={<Profile />} />
+<Route path="/admin" element={<Admin />} />
       </Routes>
       <BottomNav />
     </div>
