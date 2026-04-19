@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 export default function Profile() {
   const [user, setUser] = useState(null)
   const [registrations, setRegistrations] = useState([])
-  const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
+const [loading, setLoading] = useState(true)
   const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user
   const userId = tgUser?.id
 
@@ -107,9 +109,28 @@ export default function Profile() {
         </div>
       </div>
 
-      <h2 style={{ fontSize: '16px', marginBottom: '12px', color: '#aaa' }}>
-        Мои игры
-      </h2>
+      {userId === 938184349 && (
+  <button
+    onClick={() => navigate('/admin')}
+    style={{
+      width: '100%',
+      padding: '14px',
+      background: '#1a1a1a',
+      border: '1px solid #4CAF50',
+      borderRadius: '12px',
+      color: '#4CAF50',
+      fontSize: '15px',
+      cursor: 'pointer',
+      marginBottom: '20px',
+    }}
+  >
+    🛠 Панель администратора
+  </button>
+)}
+
+<h2 style={{ fontSize: '16px', marginBottom: '12px', color: '#aaa' }}>
+  Мои игры
+</h2>
 
       {registrations.length === 0 ? (
         <div style={{
