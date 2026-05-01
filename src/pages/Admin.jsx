@@ -54,7 +54,7 @@ export default function Admin() {
     setLoading(true)
     const gameData = {
       ...form,
-      scheduled_at: new Date(form.scheduled_at + ':00+05:00').toISOString(),
+      scheduled_at: form.scheduled_at + ':00.000+05:00',
       max_players: parseInt(form.max_players),
       min_players: parseInt(form.min_players),
       price: parseInt(form.price),
