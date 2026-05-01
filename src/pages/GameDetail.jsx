@@ -44,7 +44,7 @@ export default function GameDetail() {
   async function fetchRegistrations() {
     const { data } = await supabase
       .from('registrations')
-      .select('*')
+      .select('*, users(full_name, username)')
       .eq('game_id', id)
     setRegistrations(data || [])
     if (userId) {
@@ -225,9 +225,37 @@ export default function GameDetail() {
           fontSize: '13px',
           color: spotsLeft <= 2 ? 'var(--danger)' : 'var(--green)',
           fontWeight: '600',
+          marginBottom: registrations.length > 0 ? '14px' : '0',
         }}>
           {spotsLeft > 0 ? `✅ Свободно мест: ${spotsLeft}` : '❌ Все места заняты'}
         </p>
+
+        {registrations.length > 0 && (
+          <div style={{ borderTop: '1px solid var(--border)', paddingTop: '14px' }}>
+            <p style={{ color: 'var(--muted)', fontSize: '12px', fontWeight: '700', letterSpacing: '1px', marginBottom: '10px' }}>
+              УЧАСТНИКИ
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {registrations.map(reg => {
+                const name = reg.users?.full_name || reg.users?.username || 'Игрок'
+                const isMe = reg.user_id === userId
+                return (
+                  <div key={reg.id} style={{
+                    background: isMe ? 'rgba(0,230,118,0.08)' : '#1e1e1e',
+                    border: `1px solid ${isMe ? 'rgba(0,230,118,0.3)' : 'var(--border)'}`,
+                    borderRadius: '20px',
+                    padding: '6px 12px',
+                    fontSize: '13px',
+                    color: isMe ? 'var(--green)' : '#aaa',
+                    fontWeight: isMe ? '700' : '400',
+                  }}>
+                    {isMe ? `⚽ ${name}` : `👤 ${name}`}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Price */}
